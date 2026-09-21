@@ -42,6 +42,8 @@ DDS.defaults = {
 		[70877] = true, -- Frenzied Bloodthirst (Blood-Queen)
 		[70126] = true, -- Frost Beacon (Sindragosa)
 		[69762] = true, -- Unchained Magic (Sindragosa)
+		[69766] = true, -- Instability, casters' stacks (Sindragosa)
+		[70106] = true, -- Chilled to the Bone, melee stacks (Sindragosa)
 		[70337] = true, -- Necrotic Plague (Lich King)
 		[72754] = true, -- Defile, standing in it (Lich King)
 		[68980] = true, -- Harvest Soul (Lich King)
@@ -210,12 +212,26 @@ local function copy(v)
 	return t
 end
 
+-- Ids added to the defaults after the first release, by list version. A saved
+-- list gets each batch once, so an id you removed yourself stays removed.
+local LIST_ADDED = {
+	[2] = { 69766, 70106 }, -- Instability, Chilled to the Bone
+}
+local LIST_VERSION = 2
+
 function DDS:Init()
 	DudeDontSlackDB = DudeDontSlackDB or {}
+	local db = DudeDontSlackDB
+	-- a fresh list already holds every default
+	if db.auras == nil then db.listVersion = LIST_VERSION end
 	for k, v in pairs(self.defaults) do
-		if DudeDontSlackDB[k] == nil then DudeDontSlackDB[k] = copy(v) end
+		if db[k] == nil then db[k] = copy(v) end
 	end
-	self.db = DudeDontSlackDB
+	for version = (db.listVersion or 1) + 1, LIST_VERSION do
+		for _, id in ipairs(LIST_ADDED[version] or {}) do db.auras[id] = true end
+	end
+	db.listVersion = LIST_VERSION
+	self.db = db
 	self:CreateDisplay()
 	self:RebuildNames()
 	self:InitConfig()

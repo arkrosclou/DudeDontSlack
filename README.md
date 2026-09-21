@@ -17,7 +17,7 @@ It comes with a ready-made list, taken from what DBM warns you about:
   Touch of Light / Darkness, Penetrating Cold, Pursued by Anub'arak
 - **Icecrown Citadel**: Coldflame, Death and Decay, Mark of the Fallen Champion, Gas Spore, Vile Gas, Mutated
   Infection, Volatile Ooze, Gaseous Bloat, Unbound Plague, Pact of the Darkfallen, Swarming Shadows, Frenzied
-  Bloodthirst, Frost Beacon, Unchained Magic, Necrotic Plague, Defile, Harvest Soul, Raging Spirit
+  Bloodthirst, Frost Beacon, Unchained Magic, Instability, Chilled to the Bone, Necrotic Plague, Defile, Harvest Soul, Raging Spirit
 - **Ruby Sanctum**: Fiery Combustion, Soul Consumption, Enervating Brand, Flame Beacon
 - **Ulduar**: Searing Light, Gravity Bomb, Mark of the Faceless, Brain Link, Malady of the Mind
 

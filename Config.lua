@@ -217,8 +217,8 @@ function DDS:BuildPanel(content, width)
 
 	local resetBtn = CreateFrame("Button", nil, content, "UIPanelButtonTemplate")
 	resetBtn:SetPoint("LEFT", addBtn, "RIGHT", 4, 0)
-	resetBtn:SetWidth(70) resetBtn:SetHeight(22)
-	resetBtn:SetText("Defaults")
+	resetBtn:SetWidth(110) resetBtn:SetHeight(22)
+	resetBtn:SetText("Reset defaults")
 	resetBtn:SetScript("OnClick", function() self:ResetAuras() end)
 
 	flow:space(22)

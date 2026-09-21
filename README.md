@@ -39,3 +39,13 @@ Sanctum (Halion's combustion/consumption) and a few from Ulduar.
 /dds defaults         reset the aura list
 /dds lock | test | reset
 ```
+
+## Installation
+
+WoW 3.3.5a (Wrath of the Lich King). Download the repository and put its files
+into `Interface\AddOns\DudeDontSlack` - the folder must be named `DudeDontSlack`, the same as the
+`.toc` file. Or clone it straight there:
+
+```
+git clone https://github.com/arkrosclou/DudeDontSlack.git Interface/AddOns/DudeDontSlack
+```

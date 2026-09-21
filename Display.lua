@@ -89,12 +89,13 @@ end
 
 local function setIcon(b, icon, count, duration, expires, side)
 	b.tex:SetTexture(icon or PLACEHOLDER)
+	-- the side changes once per beacon, not with every aura update
 	if b.turned ~= side then
 		b.turned = side
 		turnIcon(b.tex, side)
+		b.side:SetText(side and sideText(side) or "")
 	end
 	b.count:SetText((count and count > 1) and count or "")
-	b.side:SetText(side and sideText(side) or "")
 	if duration and duration > 0 and expires then
 		-- the same start and duration keep the spiral running undisturbed
 		if b.cdStart ~= expires - duration or b.cdDuration ~= duration then

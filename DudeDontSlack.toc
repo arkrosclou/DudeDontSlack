@@ -1,0 +1,10 @@
+## Interface: 30300
+## Title: |cffff0000D|cffff5500u|cffffa900d|cfffffe00e|cffabff00, |cff57ff00D|cff02ff00o|cff00ff53n|cff00ffa7'|cff00fffct |cff00adffS|cff0059ffl|cff0004ffa|cff5100ffc|cffa500ffk|cfffa00ff!|r
+## Notes: A big icon when a raid mechanic lands on you: marks, chains, standing in bad stuff.
+## Author: clou
+## Version: 1.0
+## SavedVariables: DudeDontSlackDB
+
+Core.lua
+Display.lua
+Config.lua

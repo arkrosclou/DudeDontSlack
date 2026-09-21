@@ -136,6 +136,7 @@ function DDS:ScanAuras()
 				n = n + 1
 				local a = active[n] or {}
 				a.icon, a.count, a.duration, a.expires = icon, count, duration, expires
+				a.side = (name == self.beaconName) and self:BeaconSide(duration, expires) or nil
 				active[n] = a
 			end
 			i = i + 1
@@ -143,6 +144,60 @@ function DDS:ScanAuras()
 	end
 	for i = n + 1, #active do active[i] = nil end
 	return active
+end
+
+-- ---------------------------------------------------------------------------
+-- Frost Beacon side, as DBM tells it
+-- ---------------------------------------------------------------------------
+-- DBM's Sindragosa module picks left/middle/right for your beacon from the
+-- combat log order and shows "Frost Beacon - move to Left". It hands that
+-- warning to anyone listening through its DBM_Announce callback; we take the
+-- side from there, so it is always DBM's own answer. No DBM, the option off
+-- in DBM, or a text we can't read: no arrow, the icon shows as usual.
+local BEACON_ID = 70126
+local SIDES = { "LEFT", "MIDDLE", "RIGHT" }
+
+DDS.beaconName = GetSpellInfo(BEACON_ID)
+local beaconSide, beaconSideAt
+
+-- the side the warning named: of the localized words in it, the one found
+-- last, since the spell name comes first
+local function readSide(text)
+	local L = DBM_COMMON_L
+	if type(text) ~= "string" or type(L) ~= "table" then return end
+	text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+	local side, at = nil, 0
+	for _, key in ipairs(SIDES) do
+		local word = L[key]
+		if type(word) == "string" and word ~= "" then
+			local s = text:find(word, 1, true)
+			if s and s > at then side, at = key, s end
+		end
+	end
+	return side
+end
+
+local function onAnnounce(_, text, _, announceType, spellId, _, special)
+	if not special or spellId ~= BEACON_ID or announceType ~= "moveto" then return end
+	local side = readSide(text)
+	if not side then return end
+	beaconSide, beaconSideAt = side, GetTime()
+	DDS:UpdateDisplay()
+end
+
+-- DBM warns as the beacon lands, so the side belongs to the beacon applied
+-- about then; an older side never sticks to a later beacon
+function DDS:BeaconSide(duration, expires)
+	if not beaconSide or not duration or duration <= 0 or not expires then return end
+	if math.abs((expires - duration) - beaconSideAt) > 2 then return end
+	return beaconSide
+end
+
+function DDS:HookDBM()
+	if self.dbmHooked or type(DBM) ~= "table" or type(DBM.RegisterCallback) ~= "function" then return end
+	if pcall(DBM.RegisterCallback, DBM, "DBM_Announce", onAnnounce) then
+		self.dbmHooked = true
+	end
 end
 
 -- ---------------------------------------------------------------------------
@@ -170,9 +225,16 @@ local driver = CreateFrame("Frame")
 driver:RegisterEvent("ADDON_LOADED")
 driver:SetScript("OnEvent", function(self, event, arg1)
 	if event == "ADDON_LOADED" then
+		-- DBM-Core may load before or after us; hook it whichever comes last
+		if arg1 == "DBM-Core" then
+			DDS:HookDBM()
+			if DDS.db and DDS.dbmHooked then self:UnregisterEvent("ADDON_LOADED") end
+			return
+		end
 		if arg1 ~= "DudeDontSlack" then return end
-		self:UnregisterEvent("ADDON_LOADED")
 		DDS:Init()
+		DDS:HookDBM()
+		if DDS.dbmHooked then self:UnregisterEvent("ADDON_LOADED") end
 		self:RegisterEvent("UNIT_AURA")
 		self:RegisterEvent("PLAYER_ENTERING_WORLD")
 		self:RegisterEvent("RAID_ROSTER_UPDATE")

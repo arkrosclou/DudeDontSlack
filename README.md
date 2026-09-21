@@ -26,6 +26,13 @@ every difficulty.
 
 Each icon shows how long the aura lasts and its stacks. Several at once line up side by side.
 
+### Sindragosa's Frost Beacon
+
+In the air phase DBM tells each beaconed player where to run: left, middle or right. The Frost Beacon icon is
+an arrow pointing down; when DBM sends you left or right, the arrow turns to point that way, and the side is
+written over the icon. The side comes straight from DBM's own warning, so it always matches what DBM says.
+Without DBM, or with that DBM warning turned off, you just get the plain icon.
+
 ## How to install
 
 1. Download the addon: **[DudeDontSlack-master.zip](https://github.com/arkrosclou/DudeDontSlack/archive/refs/heads/master.zip)**.

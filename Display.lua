@@ -38,7 +38,42 @@ local function createIcon(parent)
 	top:SetFrameLevel(b.cd:GetFrameLevel() + 1)
 	b.count = top:CreateFontString(nil, "OVERLAY")
 	b.count:SetPoint("BOTTOMRIGHT", -3, 3)
+	-- Frost Beacon: the side DBM sent you to
+	b.side = top:CreateFontString(nil, "OVERLAY")
+	b.side:SetPoint("CENTER", 0, 0)
+	b.side:SetTextColor(1, 0.82, 0)
 	return b
+end
+
+-- DBM's own localized word, with chevrons toward the side
+local function sideText(side)
+	local L = DBM_COMMON_L
+	local word = type(L) == "table" and L[side] or side
+	word = string.upper(word or side)
+	if side == "LEFT" then return "<< " .. word
+	elseif side == "RIGHT" then return word .. " >>"
+	end
+	return ">> " .. word .. " <<"
+end
+
+-- The Frost Beacon icon is an arrow pointing down; turned a quarter it points
+-- to the side DBM sent you to. Corners are given as upper-left, lower-left,
+-- upper-right, lower-right, trimmed of the icon's own border.
+local L0, L1 = 0.07, 0.93
+local TURN = {
+	-- clockwise: down becomes left
+	LEFT = { L0, L1, L1, L1, L0, L0, L1, L0 },
+	-- counter-clockwise: down becomes right
+	RIGHT = { L1, L0, L0, L0, L1, L1, L0, L1 },
+}
+
+local function turnIcon(tex, side)
+	local c = TURN[side]
+	if c then
+		tex:SetTexCoord(c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8])
+	else
+		tex:SetTexCoord(L0, L1, L0, L1)
+	end
 end
 
 -- size and slot only change with the icon size option, not with every aura
@@ -47,13 +82,19 @@ local function placeIcon(f, b, i, size)
 	b:SetWidth(size)
 	b:SetHeight(size)
 	b.count:SetFont(FONT, math.max(10, math.floor(size * 0.3)), "OUTLINE")
+	b.side:SetFont(FONT, math.max(8, math.floor(size * 0.16)), "THICKOUTLINE")
 	b:ClearAllPoints()
 	b:SetPoint("LEFT", f, "LEFT", GAP + (i - 1) * (size + GAP), 0)
 end
 
-local function setIcon(b, icon, count, duration, expires)
+local function setIcon(b, icon, count, duration, expires, side)
 	b.tex:SetTexture(icon or PLACEHOLDER)
+	if b.turned ~= side then
+		b.turned = side
+		turnIcon(b.tex, side)
+	end
 	b.count:SetText((count and count > 1) and count or "")
+	b.side:SetText(side and sideText(side) or "")
 	if duration and duration > 0 and expires then
 		-- the same start and duration keep the spiral running undisturbed
 		if b.cdStart ~= expires - duration or b.cdDuration ~= duration then
@@ -133,7 +174,7 @@ local function sampleAuras()
 	local now = GetTime()
 	for i, id in ipairs(SAMPLE_IDS) do
 		shown[i] = { icon = select(3, GetSpellInfo(id)), count = (i == 2) and 3 or 0,
-			duration = 30, expires = now + 30 - i * 7 }
+			duration = 30, expires = now + 30 - i * 7, side = (id == 70126) and "LEFT" or nil }
 	end
 	return shown
 end
@@ -174,7 +215,7 @@ function DDS:UpdateDisplay()
 		if b.size ~= size then placeIcon(f, b, i, size) end
 		local a = list[i]
 		if a then
-			setIcon(b, a.icon, a.count, a.duration, a.expires)
+			setIcon(b, a.icon, a.count, a.duration, a.expires, a.side)
 		else
 			setIcon(b, nil)
 		end

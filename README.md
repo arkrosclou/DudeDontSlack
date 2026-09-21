@@ -1,4 +1,4 @@
-# Dude, Don't Slack!
+<h1 align="center"><img src="docs/title.png" width="500" alt="Dude, Don't Slack!"></h1>
 
 WoW 3.3.5a. Shows a big icon when a raid mechanic lands on you: marks, chains,
 standing in bad stuff. Nothing on you, nothing on screen.

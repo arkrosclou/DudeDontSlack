@@ -115,7 +115,8 @@ end
 -- ---------------------------------------------------------------------------
 function DDS:CreateDisplay()
 	local f = CreateFrame("Frame", "DudeDontSlackFrame", UIParent)
-	f:SetFrameStrata("HIGH")
+	-- LOW: the game's own windows (character, bags, spellbook) open over it
+	f:SetFrameStrata("LOW")
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)
 	f:EnableMouse(false)

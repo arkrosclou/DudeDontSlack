@@ -41,8 +41,26 @@ local function createIcon(parent)
 	-- Frost Beacon: the side DBM sent you to
 	b.side = top:CreateFontString(nil, "OVERLAY")
 	b.side:SetPoint("CENTER", 0, 0)
-	b.side:SetTextColor(1, 0.82, 0)
+	b.side:SetTextColor(1, 1, 1)
+
+	-- and a red glow around the icon while that side is shown: two bands,
+	-- the outer one fainter, so it reads as a halo rather than a border
+	b.glow = {}
+	for i = 1, 2 do
+		local g = CreateFrame("Frame", nil, b)
+		g:SetFrameLevel(math.max(0, b:GetFrameLevel() - 1))
+		g:Hide()
+		b.glow[i] = g
+	end
 	return b
+end
+
+local GLOW_ALPHA = { 0.9, 0.35 }
+
+local function showGlow(b, on)
+	for _, g in ipairs(b.glow) do
+		if on then g:Show() else g:Hide() end
+	end
 end
 
 -- DBM's own localized word, with chevrons toward the side
@@ -82,7 +100,18 @@ local function placeIcon(f, b, i, size)
 	b:SetWidth(size)
 	b:SetHeight(size)
 	b.count:SetFont(FONT, math.max(10, math.floor(size * 0.3)), "OUTLINE")
-	b.side:SetFont(FONT, math.max(8, math.floor(size * 0.16)), "THICKOUTLINE")
+	b.side:SetFont(FONT, math.max(13, math.floor(size * 0.28)), "THICKOUTLINE")
+
+	-- the glow bands sit just outside the icon, the second one beyond the first
+	local edge = math.max(2, math.floor(size * 0.09))
+	for band, g in ipairs(b.glow) do
+		g:SetBackdrop({ edgeFile = FLAT, edgeSize = edge })
+		g:SetBackdropBorderColor(1, 0.1, 0.1, GLOW_ALPHA[band])
+		g:ClearAllPoints()
+		g:SetPoint("TOPLEFT", b, "TOPLEFT", -edge * band, edge * band)
+		g:SetPoint("BOTTOMRIGHT", b, "BOTTOMRIGHT", edge * band, -edge * band)
+	end
+
 	b:ClearAllPoints()
 	b:SetPoint("LEFT", f, "LEFT", GAP + (i - 1) * (size + GAP), 0)
 end
@@ -94,6 +123,7 @@ local function setIcon(b, icon, count, duration, expires, side)
 		b.turned = side
 		turnIcon(b.tex, side)
 		b.side:SetText(side and sideText(side) or "")
+		showGlow(b, side ~= nil)
 	end
 	b.count:SetText((count and count > 1) and count or "")
 	if duration and duration > 0 and expires then

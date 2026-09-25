@@ -7,6 +7,8 @@
 A big icon in the middle of your screen when a raid mechanic lands on **you**.<br>
 Marks, chains, standing in bad stuff. Nothing on you, nothing on screen.
 
+<sub>An addon for World of Warcraft 3.3.5a (Wrath of the Lich King) — Warmane, Icecrown, Lordaeron and other 3.3.5 realms.</sub>
+
 </div>
 
 ## What it catches
